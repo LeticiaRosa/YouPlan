@@ -36,7 +36,7 @@ VITE_YOUTUBE_API_KEY=your_api_key_here
 
 ### 1. Clone o repositório
 ```bash
-git clone https://github.com/seuusuario/youplan.git
+git clone https://https://github.com/LeticiaRosa/YouPlan.git
 ```
 
 ### 2. Acesse a pasta
