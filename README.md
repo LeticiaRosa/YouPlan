@@ -31,30 +31,36 @@
 VITE_YOUTUBE_API_KEY=your_api_key_here
 ```
 
-
 ## ⚙️ Como Rodar o Projeto
 
 ### 1. Clone o repositório
+
 ```bash
 git clone https://https://github.com/LeticiaRosa/YouPlan.git
 ```
 
 ### 2. Acesse a pasta
+
 ```bash
 cd youplan
 ```
 
 ### 3. Instale as dependências
+
 ```bash
 npm install
 ```
+
 ### 4. Inicie o servidor de desenvolvimento
+
 ```bash
 npm run dev
 ```
 
 ## 📌 Licença
+
 Este projeto está sob a licença MIT.
 
 ## ✨ Autor
+
 Desenvolvido com 💙 por Letícia Rosa
