@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply m-0 p-0 bg-gray-100 text-gray-900;
+  }
+  .container {
+    @apply flex flex-col items-center justify-center py-8 max-w-4xl mx-auto bg-blue-50;
+  }
+}
