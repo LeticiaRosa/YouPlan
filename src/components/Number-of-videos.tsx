@@ -7,7 +7,7 @@ export function NumberOfVideos() {
         name="qtdevideos"
         type="number"
         placeholder="0"
-        className="rounded-2xl shadow-sm p-2 border border-gray-300 max-w-20"
+        className="input"
       />
     </div>
   );

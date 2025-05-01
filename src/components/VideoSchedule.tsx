@@ -81,7 +81,7 @@ export const VideoSchedule: React.FC = () => {
 
   return (
     <div className="card max-w-4xl">
-      <div className="flex flex-row items-center justify-center text-2xl font-bold mb-4">
+      <div className="flex flex-row items-center justify-center text-xl sm:text-2xl font-bold mb-4">
         Video Schedule
       </div>
       <div style={{ height: 500 }}>

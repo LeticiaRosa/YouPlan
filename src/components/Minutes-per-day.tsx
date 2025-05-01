@@ -20,49 +20,49 @@ export function MinutesPerDay() {
             name="price"
             type="text"
             placeholder="0"
-            className="rounded-2xl shadow-sm p-2 w-full border border-gray-300"
+            className="input"
           />
           <input
             id="price"
             name="price"
             type="text"
             placeholder="0"
-            className="rounded-2xl shadow-sm p-2 w-full border border-gray-300"
+            className="input"
           />
           <input
             id="price"
             name="price"
             type="text"
             placeholder="0"
-            className="rounded-2xl shadow-sm p-2 w-full border border-gray-300"
+            className="input"
           />
           <input
             id="price"
             name="price"
             type="text"
             placeholder="0"
-            className="rounded-2xl shadow-sm p-2 w-full border border-gray-300"
+            className="input"
           />
           <input
             id="price"
             name="price"
             type="text"
             placeholder="0"
-            className="rounded-2xl shadow-sm p-2 w-full border border-gray-300"
+            className="input"
           />
           <input
             id="price"
             name="price"
             type="text"
             placeholder="0"
-            className="rounded-2xl shadow-sm p-2 w-full border border-gray-300"
+            className="input"
           />
           <input
             id="price"
             name="price"
             type="text"
             placeholder="0"
-            className="rounded-2xl shadow-sm p-2 w-full border border-gray-300"
+            className="input"
           />
         </div>
       </div>

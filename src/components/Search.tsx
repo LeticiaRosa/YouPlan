@@ -11,8 +11,8 @@ export function Search() {
           <MagnifyingGlass className="h-5 w-5" />
         </div>
         <input
-          id="price"
-          name="price"
+          id="search"
+          name="search"
           type="text"
           placeholder="Search..."
           value={search}
