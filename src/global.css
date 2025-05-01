@@ -8,7 +8,7 @@
     @apply flex flex-col place-items-center mx-auto px-4;
   }
   .card {
-    @apply bg-white shadow-lg rounded-lg p-6 mb-4 w-full max-w-xl;
+    @apply bg-white shadow-lg rounded-lg p-6 mb-4 w-full max-w-3xl;
   }
   .card:hover {
     @apply shadow-xl transition-shadow duration-300;
