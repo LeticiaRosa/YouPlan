@@ -1,4 +1,5 @@
 import { Header } from "./components/Header";
+import { MinutesPerDay } from "./components/Minutes-per-day";
 import { Search } from "./components/Search";
 
 export default function App() {
@@ -6,6 +7,7 @@ export default function App() {
     <div className="container ">
       <Header />
       <Search />
+      <MinutesPerDay />
     </div>
   );
 }
