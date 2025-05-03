@@ -1,4 +1,8 @@
-export function NumberOfVideos() {
+type NumberOfVideosProps = {
+  register: any;
+};
+
+export function NumberOfVideos({ register }: NumberOfVideosProps) {
   return (
     <div className="py-4 gap-2 flex flex-col">
       <h1 className="text-md font-bold">Number Of Videos</h1>
@@ -8,6 +12,7 @@ export function NumberOfVideos() {
         type="number"
         placeholder="0"
         className="input"
+        {...register("qtdevideos")}
       />
     </div>
   );
