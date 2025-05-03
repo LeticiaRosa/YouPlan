@@ -1,57 +1,27 @@
+import { useForm } from "react-hook-form";
 import {
   InputMinutesPerDay,
   InputMinutesPerDayProps,
 } from "./Input-minutes-per-day";
 import { NumberOfVideos } from "./Number-of-videos";
+import { week } from "./Mok-week";
+
+type FormData = {
+  [key: string]: string;
+};
 
 export function MinutesPerDay() {
-  const week = [
-    {
-      id: 1,
-      abreviatedName: "Mon",
-      type: "number",
-      placeholder: "0",
-    },
-    {
-      id: 2,
-      abreviatedName: "Tue",
-      type: "number",
-      placeholder: "0",
-    },
-    {
-      id: 3,
-      abreviatedName: "Wed",
-      type: "number",
-      placeholder: "0",
-    },
-    {
-      id: 4,
-      abreviatedName: "Thu",
-      type: "number",
-      placeholder: "0",
-    },
-    {
-      id: 5,
-      abreviatedName: "Fri",
-      type: "number",
-      placeholder: "0",
-    },
-    {
-      id: 6,
-      abreviatedName: "Sat",
-      type: "number",
-      placeholder: "0",
-    },
-    {
-      id: 7,
-      abreviatedName: "Sun",
-      type: "number",
-      placeholder: "0",
-    },
-  ] as InputMinutesPerDayProps[];
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm();
 
+  function onHandleSubmit(data: FormData) {
+    console.log(data);
+  }
   return (
-    <div className="card">
+    <form className="card" onSubmit={handleSubmit(onHandleSubmit)}>
       <div className="flex flex-col gap-2">
         <h1 className="text-md font-bold">Minutes per day</h1>
         <div className="grid grid-cols-7 gap-2 text-center text-gray-5min">
@@ -68,17 +38,27 @@ export function MinutesPerDay() {
               placeholder,
             }: InputMinutesPerDayProps) => (
               <InputMinutesPerDay
-                key={id}
                 id={id}
+                key={abreviatedName}
                 abreviatedName={abreviatedName}
                 type={type}
                 placeholder={placeholder}
+                register={register}
               />
             )
           )}
         </div>
       </div>
-      <NumberOfVideos />
-    </div>
+
+      <div className="flex flex-row items-end justify-between gap-2 mt-4">
+        <NumberOfVideos register={register} />
+        <p className="error hidden">
+          Informe por favor a quantidade de minutos nos dias da semana
+        </p>
+        <button type="submit" className="button text-base">
+          Generate Schedule
+        </button>
+      </div>
+    </form>
   );
 }

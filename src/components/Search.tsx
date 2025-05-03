@@ -53,10 +53,7 @@ export function Search() {
           className="block min-w-0 grow  pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6"
           {...register("search")}
         />
-        <button
-          type="submit"
-          className="bg-blue-900 rounded-md text-white hover:bg-blue-600 transition-colors duration-200 ease-in-out p-1  text-sm"
-        >
+        <button type="submit" className="button">
           Search
         </button>
       </form>
