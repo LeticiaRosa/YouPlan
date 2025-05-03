@@ -5,7 +5,7 @@ export function MinutesPerDay() {
     <div className="card">
       <div className="flex flex-col gap-2">
         <h1 className="text-md font-bold">Minutes per day</h1>
-        <div className="grid grid-cols-7 gap-2 text-center text-gray-500">
+        <div className="grid grid-cols-7 gap-2 text-center text-gray-5min">
           <p>Mon</p>
           <p>Tue</p>
           <p>Wed</p>
@@ -19,49 +19,49 @@ export function MinutesPerDay() {
             id="price"
             name="price"
             type="text"
-            placeholder="0"
+            placeholder="min"
             className="input"
           />
           <input
             id="price"
             name="price"
             type="text"
-            placeholder="0"
+            placeholder="min"
             className="input"
           />
           <input
             id="price"
             name="price"
             type="text"
-            placeholder="0"
+            placeholder="min"
             className="input"
           />
           <input
             id="price"
             name="price"
             type="text"
-            placeholder="0"
+            placeholder="min"
             className="input"
           />
           <input
             id="price"
             name="price"
             type="text"
-            placeholder="0"
+            placeholder="min"
             className="input"
           />
           <input
             id="price"
             name="price"
             type="text"
-            placeholder="0"
+            placeholder="min"
             className="input"
           />
           <input
             id="price"
             name="price"
             type="text"
-            placeholder="0"
+            placeholder="min"
             className="input"
           />
         </div>

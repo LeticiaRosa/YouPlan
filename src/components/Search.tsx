@@ -3,37 +3,43 @@ import { SearchItens } from "./Search-Itens";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-type SearchProps =
+type WordsState =
   | {
       id: number;
       name: string;
     }[]
   | null;
 
-type SearchItensProps = {
+type SearchFormProps = {
   search: string;
 };
 
 export function Search() {
-  const { register, handleSubmit } = useForm<SearchItensProps>();
-  const [words, setWords] = useState<SearchProps>(null);
+  const { register, handleSubmit, reset } = useForm<SearchFormProps>();
+  const [words, setWords] = useState<WordsState>(null);
 
-  function handleOnSubmit(data: SearchItensProps) {
-    const cloneWords = [...(words || [])];
-    setWords([
-      ...cloneWords,
+  function handleOnSubmit(data: SearchFormProps) {
+    const isExistsWords = words?.find((word) => word.name === data.search);
+    if (isExistsWords) {
+      reset();
+      return;
+    }
+    setWords((word) => [
+      ...(word || []),
       {
         id: Math.floor(Math.random() * 100),
         name: data.search,
       },
     ]);
+    reset();
   }
 
-  function handleOnDelete(id: number) {
-    const cloneWords = [...(words || [])];
-    const newWords = cloneWords.filter((word) => word.id !== id);
-    setWords(newWords);
+  function handleOnDeleteWordsById(id: number) {
+    const wordWithoutId = words?.filter((word) => word.id !== id);
+    if (!wordWithoutId) return;
+    setWords(wordWithoutId);
   }
+
   return (
     <div className="card">
       <form onSubmit={handleSubmit(handleOnSubmit)} className="search-bar">
@@ -61,7 +67,7 @@ export function Search() {
             id={word.id}
             name={word.name}
             key={word.id}
-            handleOnDelete={handleOnDelete}
+            handleOnDeleteWordsById={handleOnDeleteWordsById}
           />
         ))}
       </div>
