@@ -2,6 +2,8 @@ import { MagnifyingGlass } from "phosphor-react";
 import { SearchItens } from "./Search-Itens";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 type WordsState =
   | {
@@ -10,25 +12,49 @@ type WordsState =
     }[]
   | null;
 
-type SearchFormProps = {
-  search: string;
-};
+const schema = z.object({
+  search: z.string().min(3, {
+    message: "Please enter at least 3 characters",
+  }),
+});
+
+type SearchForm = z.infer<typeof schema>;
 
 export function Search() {
-  const { register, handleSubmit, reset } = useForm<SearchFormProps>();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+    setError,
+  } = useForm<SearchForm>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      search: "",
+    },
+  });
   const [words, setWords] = useState<WordsState>(null);
 
-  function handleOnSubmit(data: SearchFormProps) {
+  function verifyErrors(data: SearchForm) {
     const isExistsWords = words?.find((word) => word.name === data.search);
     if (isExistsWords) {
-      reset();
+      setError("search", {
+        type: "manual",
+        message: "Please enter a different search term",
+      });
       return;
     }
+    return data;
+  }
+
+  function handleOnSubmit(data: SearchForm) {
+    const verific = verifyErrors(data);
+    if (!verific) return;
     setWords((word) => [
       ...(word || []),
       {
-        id: Math.floor(Math.random() * 100),
-        name: data.search,
+        id: Date.now(),
+        name: data.search.trim(),
       },
     ]);
     reset();
@@ -57,6 +83,7 @@ export function Search() {
           Search
         </button>
       </form>
+      <span className="error">{errors.search?.message}</span>
 
       <div className="flex items-start gap-2 p-1 overflow-x-auto">
         {words?.map((word) => (

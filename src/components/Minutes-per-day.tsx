@@ -11,11 +11,7 @@ type FormData = {
 };
 
 export function MinutesPerDay() {
-  const {
-    handleSubmit,
-    register,
-    formState: { errors },
-  } = useForm();
+  const { handleSubmit, register } = useForm();
 
   function onHandleSubmit(data: FormData) {
     console.log(data);
