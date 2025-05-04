@@ -2,18 +2,25 @@ import { useForm } from "react-hook-form";
 import {
   InputMinutesPerDay,
   InputMinutesPerDayProps,
+  MinutesFormData,
 } from "./Input-minutes-per-day";
 import { NumberOfVideos } from "./Number-of-videos";
 import { week } from "./Mok-week";
 
-type FormData = {
-  [key: string]: string;
-};
-
 export function MinutesPerDay() {
-  const { handleSubmit, register } = useForm();
+  const { handleSubmit, register } = useForm({
+    defaultValues: {
+      Mon: 0,
+      Tue: 0,
+      Wed: 0,
+      Thu: 0,
+      Fri: 0,
+      Sat: 0,
+      Sun: 0,
+    },
+  });
 
-  function onHandleSubmit(data: FormData) {
+  function onHandleSubmit(data: MinutesFormData) {
     console.log(data);
   }
   return (

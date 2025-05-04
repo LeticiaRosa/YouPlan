@@ -1,5 +1,8 @@
+import { UseFormRegister } from "react-hook-form";
+import { MinutesFormData } from "./Input-minutes-per-day";
+
 type NumberOfVideosProps = {
-  register: any;
+  register: UseFormRegister<MinutesFormData>;
 };
 
 export function NumberOfVideos({ register }: NumberOfVideosProps) {
@@ -8,9 +11,9 @@ export function NumberOfVideos({ register }: NumberOfVideosProps) {
       <h1 className="text-md font-bold">Number Of Videos</h1>
       <input
         id="qtdevideos"
-        name="qtdevideos"
         type="number"
         placeholder="0"
+        defaultValue={0}
         className="input"
         {...register("qtdevideos")}
       />
