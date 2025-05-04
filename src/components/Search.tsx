@@ -1,16 +1,10 @@
 import { MagnifyingGlass } from "phosphor-react";
 import { SearchItens } from "./Search-Itens";
-import { useState } from "react";
+import { useContext } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-
-type WordsState =
-  | {
-      id: number;
-      name: string;
-    }[]
-  | null;
+import { ScheduleContext } from "../contexts/ScheduleContext";
 
 const schema = z.object({
   search: z.string().min(3, {
@@ -21,6 +15,7 @@ const schema = z.object({
 type SearchForm = z.infer<typeof schema>;
 
 export function Search() {
+  const { termsSearch, setTerms } = useContext(ScheduleContext);
   const {
     register,
     handleSubmit,
@@ -33,10 +28,10 @@ export function Search() {
       search: "",
     },
   });
-  const [words, setWords] = useState<WordsState>(null);
-
   function verifyErrors(data: SearchForm) {
-    const isExistsWords = words?.find((word) => word.name === data.search);
+    const isExistsWords = termsSearch?.find(
+      (word) => word.name === data.search
+    );
     if (isExistsWords) {
       setError("search", {
         type: "manual",
@@ -50,8 +45,8 @@ export function Search() {
   function handleOnSubmit(data: SearchForm) {
     const verific = verifyErrors(data);
     if (!verific) return;
-    setWords((word) => [
-      ...(word || []),
+    setTerms([
+      ...(termsSearch || []),
       {
         id: Date.now(),
         name: data.search.trim(),
@@ -61,9 +56,9 @@ export function Search() {
   }
 
   function handleOnDeleteWordsById(id: number) {
-    const wordWithoutId = words?.filter((word) => word.id !== id);
+    const wordWithoutId = termsSearch?.filter((word) => word.id !== id);
     if (!wordWithoutId) return;
-    setWords(wordWithoutId);
+    setTerms(wordWithoutId);
   }
 
   return (
@@ -86,7 +81,7 @@ export function Search() {
       <span className="error">{errors.search?.message}</span>
 
       <div className="flex items-start gap-2 p-1 overflow-x-auto">
-        {words?.map((word) => (
+        {termsSearch?.map((word) => (
           <SearchItens
             id={word.id}
             name={word.name}
