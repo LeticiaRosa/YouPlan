@@ -7,6 +7,9 @@ import { NumberOfVideos } from "./Number-of-videos";
 import { week } from "./Mok-week";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useContext } from "react";
+import { ScheduleContext } from "../contexts/ScheduleContext";
+import { searchVideos } from "../api/services/videoService";
 
 const schema = z.object({
   Mon: z
@@ -14,40 +17,47 @@ const schema = z.object({
       message: "Informe por favor a quantidade de minutos nos dias da semana",
     })
     .min(0, "Informe por favor a quantidade de minutos nos dias da semana")
-    .max(1440)
-    .nullable(),
+    .max(1440),
   Tue: z
-    .number()
+    .number({
+      message: "Informe por favor a quantidade de minutos nos dias da semana",
+    })
     .min(0, "Informe por favor a quantidade de minutos nos dias da semana")
-    .max(1440)
-    .nullable(),
+    .max(1440),
   Wed: z
-    .number()
+    .number({
+      message: "Informe por favor a quantidade de minutos nos dias da semana",
+    })
     .min(0, "Informe por favor a quantidade de minutos nos dias da semana")
-    .max(1440)
-    .nullable(),
+    .max(1440),
   Thu: z
-    .number()
+    .number({
+      message: "Informe por favor a quantidade de minutos nos dias da semana",
+    })
     .min(0, "Informe por favor a quantidade de minutos nos dias da semana")
-    .max(1440)
-    .nullable(),
+    .max(1440),
   Fri: z
-    .number()
+    .number({
+      message: "Informe por favor a quantidade de minutos nos dias da semana",
+    })
     .min(0, "Informe por favor a quantidade de minutos nos dias da semana")
-    .max(1440)
-    .nullable(),
+    .max(1440),
   Sat: z
-    .number()
+    .number({
+      message: "Informe por favor a quantidade de minutos nos dias da semana",
+    })
     .min(0, "Informe por favor a quantidade de minutos nos dias da semana")
-    .max(1440)
-    .nullable(),
+    .max(1440),
   Sun: z
-    .number()
+    .number({
+      message: "Informe por favor a quantidade de minutos nos dias da semana",
+    })
     .min(0, "Informe por favor a quantidade de minutos nos dias da semana")
-    .max(1440)
-    .nullable(),
+    .max(1440),
   qtdeVideos: z
-    .number()
+    .number({
+      message: "Informe por favor a quantidade de videos na semana",
+    })
     .min(1, "Informe por favor a quantidade de vídeos")
     .max(100, "Informe por favor a quantidade de vídeos entre 1 e 100"),
 });
@@ -55,6 +65,7 @@ const schema = z.object({
 export type schemaType = z.infer<typeof schema>;
 
 export function MinutesPerDay() {
+  const { setMinutesPerDay, termsSearch } = useContext(ScheduleContext);
   const {
     handleSubmit,
     register,
@@ -91,6 +102,9 @@ export function MinutesPerDay() {
       return;
     }
     console.log("data", data);
+    setMinutesPerDay(data);
+    const videos = searchVideos(termsSearch);
+    console.log("videos", videos);
   }
 
   return (

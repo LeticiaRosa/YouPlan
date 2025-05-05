@@ -48,6 +48,11 @@ export function ScheduleProvider({ children }: ScheduleProviderProps) {
     setMinutesPerDayParams(params);
   };
 
+  // const executeGenerateSchedule = (termsSearch) => {
+  //   termsSearch;
+  //   minutesPerDayParams;
+  // };
+
   return (
     <ScheduleContext.Provider
       value={{ termsSearch, setTerms, clearTerms, setMinutesPerDay }}
