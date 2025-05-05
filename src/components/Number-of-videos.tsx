@@ -1,21 +1,22 @@
 import { UseFormRegister } from "react-hook-form";
-import { MinutesFormData } from "./Input-minutes-per-day";
+import { schemaType } from "./Minutes-per-day";
 
 type NumberOfVideosProps = {
-  register: UseFormRegister<MinutesFormData>;
+  register: UseFormRegister<schemaType>;
+  error: boolean;
 };
 
-export function NumberOfVideos({ register }: NumberOfVideosProps) {
+export function NumberOfVideos({ register, error }: NumberOfVideosProps) {
   return (
     <div className="py-4 gap-2 flex flex-col">
       <h1 className="text-md font-bold">Number Of Videos</h1>
       <input
-        id="qtdevideos"
+        id="qtdeVideos"
         type="number"
-        placeholder="0"
-        defaultValue={0}
-        className="input"
-        {...register("qtdevideos")}
+        className={`input  ${error ? "input-error" : ""}`}
+        {...register("qtdeVideos", {
+          valueAsNumber: true,
+        })}
       />
     </div>
   );

@@ -27,4 +27,7 @@
   .error {
     @apply text-red-500 text-sm pb-1 rounded-md mt-2;
   }
+  .input-error {
+    @apply border-red-500 border-2 rounded-xl focus-within:border-red-500 hover:border-red-500;
+  }
 }
