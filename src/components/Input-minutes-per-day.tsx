@@ -1,30 +1,32 @@
+import { UseFormRegister } from "react-hook-form";
+import { schemaType } from "./Minutes-per-day";
+
 export interface InputMinutesPerDayProps {
   id: number;
-  abreviatedName: string;
+  name: "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
   type: string;
-  placeholder: string;
-  register: any;
+  placeholder: number;
+  register: UseFormRegister<schemaType>;
+  error?: boolean; // Adicionando propriedade de erro
 }
 
 export function InputMinutesPerDay({
-  id,
-  abreviatedName,
-  type,
-  placeholder,
+  name,
   register,
+  placeholder,
+  error,
 }: InputMinutesPerDayProps) {
+  console.log("error", name, error);
   return (
     <input
-      id={id.toString()}
-      name={abreviatedName}
-      key={abreviatedName}
-      {...register(abreviatedName)}
-      type={type}
-      placeholder={placeholder}
-      className="input input-minutes-per-day"
-      min="0"
-      max="1440"
-      step="1"
+      id={name}
+      key={name}
+      {...register(name, {
+        valueAsNumber: true,
+      })}
+      type="number"
+      placeholder={placeholder.toString()}
+      className={`input  ${error ? "input-error" : ""}`}
     />
   );
 }

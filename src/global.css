@@ -25,6 +25,9 @@
     @apply bg-blue-900 rounded-md text-white hover:bg-blue-600 transition-colors duration-200 ease-in-out p-1  text-sm cursor-pointer;
   }
   .error {
-    @apply text-red-500 text-sm;
+    @apply text-red-500 text-sm pb-1 rounded-md mt-2;
+  }
+  .input-error {
+    @apply border-red-500 border-2 rounded-xl focus-within:border-red-500 hover:border-red-500;
   }
 }

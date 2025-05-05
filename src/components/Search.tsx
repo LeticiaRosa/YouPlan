@@ -1,43 +1,64 @@
 import { MagnifyingGlass } from "phosphor-react";
 import { SearchItens } from "./Search-Itens";
-import { useState } from "react";
+import { useContext } from "react";
 import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ScheduleContext } from "../contexts/ScheduleContext";
 
-type WordsState =
-  | {
-      id: number;
-      name: string;
-    }[]
-  | null;
+const schema = z.object({
+  search: z.string().min(3, {
+    message: "Please enter at least 3 characters",
+  }),
+});
 
-type SearchFormProps = {
-  search: string;
-};
+type SearchForm = z.infer<typeof schema>;
 
 export function Search() {
-  const { register, handleSubmit, reset } = useForm<SearchFormProps>();
-  const [words, setWords] = useState<WordsState>(null);
-
-  function handleOnSubmit(data: SearchFormProps) {
-    const isExistsWords = words?.find((word) => word.name === data.search);
+  const { termsSearch, setTerms } = useContext(ScheduleContext);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+    setError,
+  } = useForm<SearchForm>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      search: "",
+    },
+  });
+  function verifyErrors(data: SearchForm) {
+    const isExistsWords = termsSearch?.find(
+      (word) => word.name === data.search
+    );
     if (isExistsWords) {
-      reset();
+      setError("search", {
+        type: "manual",
+        message: "Please enter a different search term",
+      });
       return;
     }
-    setWords((word) => [
-      ...(word || []),
+    return data;
+  }
+
+  function handleOnSubmit(data: SearchForm) {
+    const verific = verifyErrors(data);
+    if (!verific) return;
+    setTerms([
+      ...(termsSearch || []),
       {
-        id: Math.floor(Math.random() * 100),
-        name: data.search,
+        id: Date.now(),
+        name: data.search.trim(),
       },
     ]);
     reset();
   }
 
   function handleOnDeleteWordsById(id: number) {
-    const wordWithoutId = words?.filter((word) => word.id !== id);
+    const wordWithoutId = termsSearch?.filter((word) => word.id !== id);
     if (!wordWithoutId) return;
-    setWords(wordWithoutId);
+    setTerms(wordWithoutId);
   }
 
   return (
@@ -57,9 +78,10 @@ export function Search() {
           Search
         </button>
       </form>
+      <span className="error">{errors.search?.message}</span>
 
       <div className="flex items-start gap-2 p-1 overflow-x-auto">
-        {words?.map((word) => (
+        {termsSearch?.map((word) => (
           <SearchItens
             id={word.id}
             name={word.name}
