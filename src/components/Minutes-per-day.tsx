@@ -17,37 +17,51 @@ const schema = z.object({
     .max(1440)
     .nullable(),
   Tue: z
-    .number()
+    .number({
+      message: "Informe por favor a quantidade de minutos nos dias da semana",
+    })
     .min(0, "Informe por favor a quantidade de minutos nos dias da semana")
     .max(1440)
     .nullable(),
   Wed: z
-    .number()
+    .number({
+      message: "Informe por favor a quantidade de minutos nos dias da semana",
+    })
     .min(0, "Informe por favor a quantidade de minutos nos dias da semana")
     .max(1440)
     .nullable(),
   Thu: z
-    .number()
+    .number({
+      message: "Informe por favor a quantidade de minutos nos dias da semana",
+    })
     .min(0, "Informe por favor a quantidade de minutos nos dias da semana")
     .max(1440)
     .nullable(),
   Fri: z
-    .number()
+    .number({
+      message: "Informe por favor a quantidade de minutos nos dias da semana",
+    })
     .min(0, "Informe por favor a quantidade de minutos nos dias da semana")
     .max(1440)
     .nullable(),
   Sat: z
-    .number()
+    .number({
+      message: "Informe por favor a quantidade de minutos nos dias da semana",
+    })
     .min(0, "Informe por favor a quantidade de minutos nos dias da semana")
     .max(1440)
     .nullable(),
   Sun: z
-    .number()
+    .number({
+      message: "Informe por favor a quantidade de minutos nos dias da semana",
+    })
     .min(0, "Informe por favor a quantidade de minutos nos dias da semana")
     .max(1440)
     .nullable(),
   qtdeVideos: z
-    .number()
+    .number({
+      message: "Informe por favor a quantidade de videos na semana",
+    })
     .min(1, "Informe por favor a quantidade de vídeos")
     .max(100, "Informe por favor a quantidade de vídeos entre 1 e 100"),
 });

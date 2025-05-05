@@ -16,7 +16,6 @@ export function InputMinutesPerDay({
   placeholder,
   error,
 }: InputMinutesPerDayProps) {
-  console.log("error", name, error);
   return (
     <input
       id={name}
@@ -26,7 +25,7 @@ export function InputMinutesPerDay({
       })}
       type="number"
       placeholder={placeholder.toString()}
-      className={`input  ${error ? "input-error" : ""}`}
+      className={`  ${error ? "input-error" : "input"}`}
     />
   );
 }
