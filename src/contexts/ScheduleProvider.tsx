@@ -12,7 +12,7 @@ export type TermsSearchType =
     }[]
   | null;
 
-type TermsMinutesType = {
+export type MinutesPerDayParams = {
   Mon: number;
   Tue: number;
   Wed: number;
@@ -21,16 +21,18 @@ type TermsMinutesType = {
   Sat: number;
   Sun: number;
   qtdeVideos: number;
-};
+} | null;
 
 export type ScheduleContextType = {
   termsSearch: TermsSearchType;
   setTerms: (terms: TermsSearchType) => void;
   clearTerms: () => void;
+  setMinutesPerDay: (terms: MinutesPerDayParams) => void;
 };
 
 export function ScheduleProvider({ children }: ScheduleProviderProps) {
   const [termsSearch, setTermsSearch] = useState<TermsSearchType>(null);
+  const [, setMinutesPerDayParams] = useState<MinutesPerDayParams>(null);
 
   const setTerms = (terms: TermsSearchType) => {
     console.log("setTerms", terms);
@@ -41,8 +43,15 @@ export function ScheduleProvider({ children }: ScheduleProviderProps) {
     setTermsSearch(null);
   };
 
+  const setMinutesPerDay = (params: MinutesPerDayParams) => {
+    console.log("setMinutesPerDay", params);
+    setMinutesPerDayParams(params);
+  };
+
   return (
-    <ScheduleContext.Provider value={{ termsSearch, setTerms, clearTerms }}>
+    <ScheduleContext.Provider
+      value={{ termsSearch, setTerms, clearTerms, setMinutesPerDay }}
+    >
       {children}
     </ScheduleContext.Provider>
   );
