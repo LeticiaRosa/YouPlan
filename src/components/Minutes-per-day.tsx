@@ -9,6 +9,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useContext } from "react";
 import { ScheduleContext } from "../contexts/ScheduleContext";
+import { searchVideos } from "../api/services/videoService";
 
 const schema = z.object({
   Mon: z
@@ -64,7 +65,7 @@ const schema = z.object({
 export type schemaType = z.infer<typeof schema>;
 
 export function MinutesPerDay() {
-  const { setMinutesPerDay } = useContext(ScheduleContext);
+  const { setMinutesPerDay, termsSearch } = useContext(ScheduleContext);
   const {
     handleSubmit,
     register,
@@ -102,6 +103,8 @@ export function MinutesPerDay() {
     }
     console.log("data", data);
     setMinutesPerDay(data);
+    const videos = searchVideos(termsSearch);
+    console.log("videos", videos);
   }
 
   return (
