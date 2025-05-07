@@ -1,4 +1,4 @@
-import { InputMinutesPerDayProps } from "./Input-minutes-per-day";
+import { InputMinutesPerDayProps } from "../../components/Form/Minutes-per-day/Input-minutes-per-day";
 
 export const week = [
   {

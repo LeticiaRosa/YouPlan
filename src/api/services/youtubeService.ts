@@ -14,8 +14,9 @@ export async function buscarVideosYouTube(
         key: API_KEY,
         q: termo,
         part: "snippet",
-        maxResults: 10,
-        type: "video",
+        maxResults: 50,
+        type: "images",
+        ideoDuration: "long",
       },
     });
 
