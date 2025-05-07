@@ -7,7 +7,6 @@ import {
   InputMinutesPerDayProps,
 } from "./Input-minutes-per-day";
 import { NumberOfVideos } from "./Number-of-videos";
-import { searchVideos } from "../../../api/services/videoService";
 
 type MinutesPerDayType = {
   Mon: number;
@@ -21,7 +20,8 @@ type MinutesPerDayType = {
 };
 
 export function MinutesPerDay() {
-  const { setMinutesPerDay, termsSearch } = useContext(ScheduleContext);
+  const { setMinutesPerDay, termsSearch, executeGenerateSchedule } =
+    useContext(ScheduleContext);
   const {
     handleSubmit,
     register,
@@ -52,11 +52,8 @@ export function MinutesPerDay() {
       });
       return;
     }
-    console.log("data", data);
     setMinutesPerDay(data);
-
-    const videos = searchVideos(termsSearch);
-    console.log("videos", videos);
+    executeGenerateSchedule();
   }
 
   return (
