@@ -1,68 +1,24 @@
-import { useForm, UseFormRegister } from "react-hook-form";
+import { useFormContext, UseFormRegister } from "react-hook-form";
+import { useContext } from "react";
+import { ScheduleContext } from "../../../contexts/ScheduleContext";
+import { week } from "../../../api/mock/week";
 import {
   InputMinutesPerDay,
   InputMinutesPerDayProps,
 } from "./Input-minutes-per-day";
 import { NumberOfVideos } from "./Number-of-videos";
-import { week } from "./Mok-week";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useContext } from "react";
-import { ScheduleContext } from "../contexts/ScheduleContext";
-import { searchVideos } from "../api/services/videoService";
+import { searchVideos } from "../../../api/services/videoService";
 
-const schema = z.object({
-  Mon: z
-    .number({
-      message: "Informe por favor a quantidade de minutos nos dias da semana",
-    })
-    .min(0, "Informe por favor a quantidade de minutos nos dias da semana")
-    .max(1440),
-  Tue: z
-    .number({
-      message: "Informe por favor a quantidade de minutos nos dias da semana",
-    })
-    .min(0, "Informe por favor a quantidade de minutos nos dias da semana")
-    .max(1440),
-  Wed: z
-    .number({
-      message: "Informe por favor a quantidade de minutos nos dias da semana",
-    })
-    .min(0, "Informe por favor a quantidade de minutos nos dias da semana")
-    .max(1440),
-  Thu: z
-    .number({
-      message: "Informe por favor a quantidade de minutos nos dias da semana",
-    })
-    .min(0, "Informe por favor a quantidade de minutos nos dias da semana")
-    .max(1440),
-  Fri: z
-    .number({
-      message: "Informe por favor a quantidade de minutos nos dias da semana",
-    })
-    .min(0, "Informe por favor a quantidade de minutos nos dias da semana")
-    .max(1440),
-  Sat: z
-    .number({
-      message: "Informe por favor a quantidade de minutos nos dias da semana",
-    })
-    .min(0, "Informe por favor a quantidade de minutos nos dias da semana")
-    .max(1440),
-  Sun: z
-    .number({
-      message: "Informe por favor a quantidade de minutos nos dias da semana",
-    })
-    .min(0, "Informe por favor a quantidade de minutos nos dias da semana")
-    .max(1440),
-  qtdeVideos: z
-    .number({
-      message: "Informe por favor a quantidade de videos na semana",
-    })
-    .min(1, "Informe por favor a quantidade de vídeos")
-    .max(100, "Informe por favor a quantidade de vídeos entre 1 e 100"),
-});
-
-export type schemaType = z.infer<typeof schema>;
+type MinutesPerDayType = {
+  Mon: number;
+  Tue: number;
+  Wed: number;
+  Thu: number;
+  Fri: number;
+  Sat: number;
+  Sun: number;
+  qtdeVideos: number;
+};
 
 export function MinutesPerDay() {
   const { setMinutesPerDay, termsSearch } = useContext(ScheduleContext);
@@ -71,21 +27,16 @@ export function MinutesPerDay() {
     register,
     formState: { errors },
     setError,
-  } = useForm<schemaType>({
-    defaultValues: {
-      Mon: 0,
-      Tue: 0,
-      Wed: 0,
-      Thu: 0,
-      Fri: 0,
-      Sat: 0,
-      Sun: 0,
-      qtdeVideos: 0,
-    },
-    resolver: zodResolver(schema),
-  });
+  } = useFormContext<MinutesPerDayType>();
 
-  function onHandleSubmit(data: schemaType) {
+  function onHandleSubmit(data: MinutesPerDayType) {
+    if (!termsSearch) {
+      setError("search" as keyof MinutesPerDayType, {
+        type: "manual",
+        message: "Informe por favor os termos de busca no campo Search",
+      });
+      return;
+    }
     if (
       data.Mon === 0 &&
       data.Tue === 0 &&
@@ -103,6 +54,7 @@ export function MinutesPerDay() {
     }
     console.log("data", data);
     setMinutesPerDay(data);
+
     const videos = searchVideos(termsSearch);
     console.log("videos", videos);
   }
@@ -125,7 +77,7 @@ export function MinutesPerDay() {
                 name={name}
                 type={type}
                 placeholder={placeholder}
-                register={register as UseFormRegister<schemaType>}
+                register={register as UseFormRegister<MinutesPerDayType>}
                 error={!!errors[name]} // Passando informação de erro como boolean
               />
             )
@@ -135,7 +87,7 @@ export function MinutesPerDay() {
 
       <div className="flex flex-row items-end justify-between gap-2 mt-4">
         <NumberOfVideos
-          register={register as UseFormRegister<schemaType>}
+          register={register as UseFormRegister<MinutesPerDayType>}
           error={!!errors["qtdeVideos"]}
         />
         <div className="flex flex-row items-end justify-between gap-2 mt-4">
