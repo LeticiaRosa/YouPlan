@@ -23,6 +23,7 @@ const localizer = dateFnsLocalizer({
 
 // Tipagem do evento
 interface VideoEvent extends CalendarEvent {
+  id: string;
   title: string;
   start: Date;
   end: Date;
@@ -32,37 +33,31 @@ interface VideoEvent extends CalendarEvent {
 const currentDate = new Date();
 const events: VideoEvent[] = [
   {
+    id: "75J0h_-nMvs",
     title: "Curso React - 30min",
     start: new Date(
       currentDate.getFullYear(),
       currentDate.getMonth(),
-      currentDate.getDate(),
-      14,
-      0
+      currentDate.getDate()
     ),
     end: new Date(
       currentDate.getFullYear(),
       currentDate.getMonth(),
-      currentDate.getDate(),
-      14,
-      30
+      currentDate.getDate()
     ),
   },
   {
+    id: "v-pJdP-AIw8",
     title: "YouTube API - 45min",
     start: new Date(
       currentDate.getFullYear(),
       currentDate.getMonth(),
-      currentDate.getDate() + 1,
-      20,
-      0
+      currentDate.getDate() + 1
     ),
     end: new Date(
       currentDate.getFullYear(),
       currentDate.getMonth(),
-      currentDate.getDate() + 1,
-      20,
-      45
+      currentDate.getDate() + 1
     ),
   },
 ];
@@ -79,6 +74,10 @@ export const VideoSchedule: React.FC = () => {
     setView(newView);
   };
 
+  const handleSelectEvent = (event: VideoEvent) => {
+    window.open(`https://www.youtube.com/watch?v=${event.id}`, "_blank");
+  };
+
   return (
     <div className="card max-w-4xl">
       <div className="flex flex-row items-center justify-center text-xl sm:text-2xl font-bold mb-4">
@@ -90,13 +89,14 @@ export const VideoSchedule: React.FC = () => {
           events={events}
           startAccessor="start"
           endAccessor="end"
-          views={["month", "week", "day", "agenda"]}
+          views={["month", "agenda"]}
           defaultView="month"
           view={view}
           date={date}
           onNavigate={handleNavigate}
           onView={handleView}
           culture="pt-BR"
+          onSelectEvent={(event) => handleSelectEvent(event)}
           style={{ height: "100%" }}
           messages={{
             week: "Semana",

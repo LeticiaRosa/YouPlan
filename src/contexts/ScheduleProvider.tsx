@@ -98,12 +98,12 @@ export function ScheduleProvider({ children }: ScheduleProviderProps) {
       while (totalMinutesDay > 0) {
         const videosFiltreded = videos?.filter(
           (video) =>
-            video.durationMinutes < totalMinutesDay && !video.isScheduled
+            video.durationMinutes < totalMinutesDay && !video.dayScheduled
         );
         const firstVideo = videosFiltreded ? videosFiltreded[0] : null;
         videos = videos?.map((video) => {
           if (video.videoId === firstVideo?.videoId) {
-            return { ...video, isScheduled: true, day: day.day };
+            return { ...video, dayScheduled: day.day };
           }
           return video;
         });
