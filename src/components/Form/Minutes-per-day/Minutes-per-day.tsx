@@ -7,8 +7,9 @@ import {
   InputMinutesPerDayProps,
 } from "./Input-minutes-per-day";
 import { NumberOfVideos } from "./Number-of-videos";
+import { MinutesPerDayParams } from "../../../contexts/ScheduleProvider";
 
-type MinutesPerDayType = {
+type MinutesPerDaySchema = {
   Mon: number;
   Tue: number;
   Wed: number;
@@ -27,11 +28,11 @@ export function MinutesPerDay() {
     register,
     formState: { errors },
     setError,
-  } = useFormContext<MinutesPerDayType>();
+  } = useFormContext<MinutesPerDaySchema>();
 
-  function onHandleSubmit(data: MinutesPerDayType) {
+  function onHandleSubmit(data: MinutesPerDaySchema) {
     if (!termsSearch) {
-      setError("search" as keyof MinutesPerDayType, {
+      setError("search" as keyof MinutesPerDaySchema, {
         type: "manual",
         message: "Informe por favor os termos de busca no campo Search",
       });
@@ -46,13 +47,24 @@ export function MinutesPerDay() {
       data.Sat === 0 &&
       data.Sun === 0
     ) {
-      setError("Mon", {
+      setError("Mon" as keyof MinutesPerDaySchema, {
         type: "manual",
         message: "Informe por favor a quantidade de minutos nos dias da semana",
       });
       return;
     }
-    setMinutesPerDay(data);
+    setMinutesPerDay({
+      days: [
+        { day: "Mon", minutes: data.Mon },
+        { day: "Tue", minutes: data.Tue },
+        { day: "Wed", minutes: data.Wed },
+        { day: "Thu", minutes: data.Thu },
+        { day: "Fri", minutes: data.Fri },
+        { day: "Sat", minutes: data.Sat },
+        { day: "Sun", minutes: data.Sun },
+      ],
+      qtdeVideos: data.qtdeVideos,
+    } as MinutesPerDayParams);
     executeGenerateSchedule();
   }
 
@@ -74,8 +86,8 @@ export function MinutesPerDay() {
                 name={name}
                 type={type}
                 placeholder={placeholder}
-                register={register as UseFormRegister<MinutesPerDayType>}
-                error={!!errors[name]} // Passando informação de erro como boolean
+                register={register as UseFormRegister<MinutesPerDaySchema>}
+                error={!!errors[name as keyof MinutesPerDaySchema]} // Passando informação de erro como boolean
               />
             )
           )}
@@ -84,7 +96,7 @@ export function MinutesPerDay() {
 
       <div className="flex flex-row items-end justify-between gap-2 mt-4">
         <NumberOfVideos
-          register={register as UseFormRegister<MinutesPerDayType>}
+          register={register as UseFormRegister<MinutesPerDaySchema>}
           error={!!errors["qtdeVideos"]}
         />
         <div className="flex flex-row items-end justify-between gap-2 mt-4">

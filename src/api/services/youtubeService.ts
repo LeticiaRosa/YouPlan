@@ -15,8 +15,8 @@ export async function buscarVideosYouTube(
         q: termo,
         part: "snippet",
         maxResults: 50,
-        type: "images",
-        ideoDuration: "long",
+        type: "video",
+        videoDuration: "medium",
       },
     });
 
@@ -49,6 +49,19 @@ export async function buscarVideosYouTube(
 export const getVideoDurations = async (
   videoIds: string[]
 ): Promise<VideoDuration[]> => {
+  function parseISODurationToMinutes(isoDuration: string): number {
+    const regex = /PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/;
+    const match = isoDuration.match(regex);
+
+    if (!match) return 0;
+
+    const hours = parseInt(match[1] || "0");
+    const minutes = parseInt(match[2] || "0");
+    const seconds = parseInt(match[3] || "0");
+
+    return hours * 60 + minutes + seconds / 60;
+  }
+
   const API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY;
   try {
     const response = await api.get("/videos", {
@@ -59,10 +72,16 @@ export const getVideoDurations = async (
       },
     });
 
-    const durations = response.data.items.map((item: any) => ({
-      id: item.id,
-      duration: item.contentDetails.duration,
-    }));
+    const durations = response.data.items.map((duration: any) => {
+      const parsedDuration = parseISODurationToMinutes(
+        duration.contentDetails.duration
+      );
+      return {
+        id: duration.id,
+        duration: duration.contentDetails.duration,
+        durationMinutes: parsedDuration,
+      };
+    });
 
     return durations;
   } catch (err) {

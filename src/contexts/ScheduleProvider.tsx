@@ -2,7 +2,6 @@ import { useState } from "react";
 import { ScheduleContext } from "./ScheduleContext";
 import { searchVideos } from "../api/services/videoService";
 import { getVideoDurations } from "../api/services/youtubeService";
-import { format, formatISODuration, parse, parseISO } from "date-fns";
 
 export interface ScheduleProviderProps {
   children: React.ReactNode;
@@ -15,28 +14,52 @@ export type TermsSearchType =
     }[]
   | null;
 
-export type MinutesPerDayParams = {
-  Mon: number;
-  Tue: number;
-  Wed: number;
-  Thu: number;
-  Fri: number;
-  Sat: number;
-  Sun: number;
+export type DayOfWeek =
+  | "Mon"
+  | "Tue"
+  | "Wed"
+  | "Thu"
+  | "Fri"
+  | "Sat"
+  | "Sun"
+  | string;
+
+export interface MinutesPerDay {
+  day: DayOfWeek;
+  minutes: number;
+}
+
+export interface MinutesPerDayParams {
+  days: MinutesPerDay[];
   qtdeVideos: number;
-} | null;
+}
 
 export type ScheduleContextType = {
+  listVideos: any;
   termsSearch: TermsSearchType;
   setTerms: (terms: TermsSearchType) => void;
   clearTerms: () => void;
+  minutesPerDayParams: MinutesPerDayParams;
   setMinutesPerDay: (terms: MinutesPerDayParams) => void;
   executeGenerateSchedule: () => void;
 };
 
 export function ScheduleProvider({ children }: ScheduleProviderProps) {
+  const [listVideos, setListVideos] = useState();
   const [termsSearch, setTermsSearch] = useState<TermsSearchType>(null);
-  const [, setMinutesPerDayParams] = useState<MinutesPerDayParams>(null);
+  const [minutesPerDayParams, setMinutesPerDayParams] =
+    useState<MinutesPerDayParams>({
+      days: [
+        { day: "Mon", minutes: 0 },
+        { day: "Tue", minutes: 0 },
+        { day: "Wed", minutes: 0 },
+        { day: "Thu", minutes: 0 },
+        { day: "Fri", minutes: 0 },
+        { day: "Sat", minutes: 0 },
+        { day: "Sun", minutes: 0 },
+      ],
+      qtdeVideos: 0,
+    });
 
   const setTerms = (terms: TermsSearchType) => {
     setTermsSearch(terms);
@@ -49,42 +72,63 @@ export function ScheduleProvider({ children }: ScheduleProviderProps) {
   const setMinutesPerDay = (params: MinutesPerDayParams) => {
     setMinutesPerDayParams(params);
   };
-  const parseISODurationToMinutes = (duration: string): number => {
-    const regex = /PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/;
-    const matches = duration.match(regex);
 
-    const hours = parseInt(matches?.[1] || "0", 10);
-    const minutes = parseInt(matches?.[2] || "0", 10);
-    const seconds = parseInt(matches?.[3] || "0", 10);
-
-    return Math.floor(hours * 60 + minutes + seconds / 60);
+  const getVideosWithDurations = async () => {
+    const videos = await searchVideos(termsSearch);
+    const listIds = videos?.map((video) => video.videoId);
+    const durations = await getVideoDurations(listIds as string[]);
+    const listVideosWithDurations = videos?.map((video) => {
+      const duration = durations.find(
+        (duration) => duration.id === video.videoId
+      );
+      return {
+        ...video,
+        durationMinutes: duration ? duration.durationMinutes : 0,
+      };
+    });
+    return listVideosWithDurations;
   };
 
   const executeGenerateSchedule = async () => {
-    // const videos = await searchVideos(termsSearch);
-    // const listIds = videos?.map((video) => video.videoId);
-    // const durations = await getVideoDurations(listIds as string[]);
-    // console.log("durations", durations);
-    console.log("PT22S =>", parseISODurationToMinutes("PT12S"));
-    // const filtered = durations.filter((d) => d.duration !== "PT0S");
-    // const formattedDurations = filtered.map((duration) => {
-    //   const parsedDuration = parseISODurationToMinutes(duration.duration);
-    //   console.log("parsedDuration", parsedDuration);
-    //   return parsedDuration;
-    // });
-
-    // console.log("durations", formattedDurations);
-    // return durations;
+    let videos = await getVideosWithDurations();
+    console.log("videos", videos);
+    minutesPerDayParams.days.forEach(async (day) => {
+      let totalMinutesDay = day.minutes;
+      console.log("totalMinutesDay", totalMinutesDay);
+      while (totalMinutesDay > 0) {
+        const videosFiltreded = videos?.filter(
+          (video) =>
+            video.durationMinutes < totalMinutesDay && !video.isScheduled
+        );
+        const firstVideo = videosFiltreded ? videosFiltreded[0] : null;
+        videos = videos?.map((video) => {
+          if (video.videoId === firstVideo?.videoId) {
+            return { ...video, isScheduled: true, day: day.day };
+          }
+          return video;
+        });
+        console.log("firstVideo", firstVideo);
+        if (!firstVideo) {
+          break;
+        }
+        totalMinutesDay -= firstVideo.durationMinutes;
+        console.log("após subtração totalMinutesDay:", totalMinutesDay);
+      }
+      console.log("videos após o filtro", videos);
+      setListVideos(videos);
+    });
   };
-
+  console.log(listVideos);
   return (
     <ScheduleContext.Provider
       value={{
         termsSearch,
         setTerms,
         clearTerms,
+        minutesPerDayParams,
         setMinutesPerDay,
         executeGenerateSchedule,
+        listVideos,
       }}
     >
       {children}
