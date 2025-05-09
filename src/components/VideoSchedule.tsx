@@ -7,7 +7,8 @@ import {
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
+import { ScheduleContext } from "../contexts/ScheduleContext";
 
 const locales = {
   "pt-BR": ptBR,
@@ -22,50 +23,22 @@ const localizer = dateFnsLocalizer({
 });
 
 // Tipagem do evento
-interface VideoEvent extends CalendarEvent {
+export interface VideoEvent extends CalendarEvent {
   id: string;
   title: string;
+  description?: string;
   start: Date;
   end: Date;
+  dayName: string;
+  thumbnailUrl?: string;
+  durationMinutes: number;
 }
 
-// Datas relativas ao mês atual em vez de datas fixas no futuro distante
-const currentDate = new Date();
-const events: VideoEvent[] = [
-  {
-    id: "75J0h_-nMvs",
-    title: "Curso React - 30min",
-    start: new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth(),
-      currentDate.getDate()
-    ),
-    end: new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth(),
-      currentDate.getDate()
-    ),
-  },
-  {
-    id: "v-pJdP-AIw8",
-    title: "YouTube API - 45min",
-    start: new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth(),
-      currentDate.getDate() + 1
-    ),
-    end: new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth(),
-      currentDate.getDate() + 1
-    ),
-  },
-];
-
-export const VideoSchedule: React.FC = () => {
+export function VideoSchedule() {
   const [date, setDate] = useState(new Date());
   const [view, setView] = useState<View>("month");
-
+  const { listVideos } = useContext(ScheduleContext);
+  console.log("lista", listVideos);
   const handleNavigate = (newDate: Date) => {
     setDate(newDate);
   };
@@ -86,7 +59,7 @@ export const VideoSchedule: React.FC = () => {
       <div style={{ height: 500 }}>
         <Calendar
           localizer={localizer}
-          events={events}
+          events={listVideos}
           startAccessor="start"
           endAccessor="end"
           views={["month", "agenda"]}
@@ -117,4 +90,4 @@ export const VideoSchedule: React.FC = () => {
       </div>
     </div>
   );
-};
+}

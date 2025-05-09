@@ -5,7 +5,9 @@ import { VideoDuration, YouTubeVideo } from "../types/youtube";
  * Busca vídeos no YouTube com base no termo de busca
  */
 export async function buscarVideosYouTube(
-  termo: string
+  maxResults: number,
+  termo: string,
+  pageToken?: string
 ): Promise<YouTubeVideo[]> {
   const API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY;
   try {
@@ -14,9 +16,10 @@ export async function buscarVideosYouTube(
         key: API_KEY,
         q: termo,
         part: "snippet",
-        maxResults: 50,
+        maxResults: maxResults,
         type: "video",
         videoDuration: "medium",
+        pageToken: pageToken,
       },
     });
 
@@ -29,14 +32,17 @@ export async function buscarVideosYouTube(
           thumbnails: { medium: { url: string } };
         };
       }) => ({
-        videoId: item.id.videoId,
+        id: item.id.videoId,
         title: item.snippet.title,
         description: item.snippet.description,
         thumbnailUrl: item.snippet.thumbnails.medium.url,
       })
     );
 
-    return videos;
+    return {
+      videos,
+      nextPageToken: response.data.nextPageToken,
+    };
   } catch (error) {
     console.error("Erro ao buscar vídeos do YouTube:", error);
     return [];
@@ -76,6 +82,7 @@ export const getVideoDurations = async (
       const parsedDuration = parseISODurationToMinutes(
         duration.contentDetails.duration
       );
+      console.log(parsedDuration);
       return {
         id: duration.id,
         duration: duration.contentDetails.duration,

@@ -48,7 +48,7 @@ export const schema = z.object({
       message: "Informe por favor a quantidade de videos na semana",
     })
     .min(1, "Informe por favor a quantidade de vídeos")
-    .max(100, "Informe por favor a quantidade de vídeos entre 1 e 100"),
+    .max(200, "Informe por favor a quantidade de vídeos entre 1 e 200"),
   search: z.string(),
 });
 
