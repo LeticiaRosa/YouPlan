@@ -1,14 +1,11 @@
 import { api } from "../clients/youtube";
-import { VideoDuration, YouTubeVideo } from "../types/youtube";
+import { VideoDuration, YouTubeResponse, YouTubeVideo } from "../types/youtube";
 
-/**
- * Busca vídeos no YouTube com base no termo de busca
- */
 export async function buscarVideosYouTube(
   maxResults: number,
   termo: string,
   pageToken?: string
-): Promise<YouTubeVideo[]> {
+): Promise<YouTubeResponse | []> {
   const API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY;
   try {
     const response = await api.get("/search", {
@@ -45,13 +42,10 @@ export async function buscarVideosYouTube(
     };
   } catch (error) {
     console.error("Erro ao buscar vídeos do YouTube:", error);
-    return [];
+    return { videos: [], nextPageToken: null };
   }
 }
 
-/**
- * Obtém a duração de vídeos por seus IDs
- */
 export const getVideoDurations = async (
   videoIds: string[]
 ): Promise<VideoDuration[]> => {
@@ -78,17 +72,23 @@ export const getVideoDurations = async (
       },
     });
 
-    const durations = response.data.items.map((duration: any) => {
-      const parsedDuration = parseISODurationToMinutes(
-        duration.contentDetails.duration
-      );
-      console.log(parsedDuration);
-      return {
-        id: duration.id,
-        duration: duration.contentDetails.duration,
-        durationMinutes: parsedDuration,
-      };
-    });
+    const durations = response.data.items.map(
+      (duration: {
+        id: string;
+        contentDetails: {
+          duration: string;
+        };
+      }) => {
+        const parsedDuration = parseISODurationToMinutes(
+          duration.contentDetails.duration
+        );
+        return {
+          id: duration.id,
+          duration: duration.contentDetails.duration,
+          durationMinutes: parsedDuration,
+        };
+      }
+    );
 
     return durations;
   } catch (err) {

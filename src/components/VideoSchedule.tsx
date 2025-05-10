@@ -7,7 +7,7 @@ import {
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import React, { useContext, useState } from "react";
+import { useContext, useState } from "react";
 import { ScheduleContext } from "../contexts/ScheduleContext";
 
 const locales = {
@@ -25,10 +25,7 @@ const localizer = dateFnsLocalizer({
 // Tipagem do evento
 export interface VideoEvent extends CalendarEvent {
   id: string;
-  title: string;
   description?: string;
-  start: Date;
-  end: Date;
   dayName: string;
   thumbnailUrl?: string;
   durationMinutes: number;

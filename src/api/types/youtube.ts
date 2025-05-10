@@ -5,7 +5,13 @@ export interface YouTubeVideo {
   thumbnailUrl: string;
 }
 
+export interface YouTubeResponse {
+  videos: YouTubeVideo[];
+  nextPageToken: string | null;
+}
+
 export interface VideoDuration {
   id: string;
   duration: string;
+  durationMinutes: number;
 }

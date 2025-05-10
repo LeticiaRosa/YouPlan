@@ -36,7 +36,7 @@ export interface MinutesPerDayParams {
 }
 
 export type ScheduleContextType = {
-  listVideos: VideoEvent;
+  listVideos: VideoEvent[];
   termsSearch: TermsSearchType;
   setTerms: (terms: TermsSearchType) => void;
   clearTerms: () => void;
@@ -46,7 +46,7 @@ export type ScheduleContextType = {
 };
 
 export function ScheduleProvider({ children }: ScheduleProviderProps) {
-  const [listVideos, setListVideos] = useState<VideoEvent>();
+  const [listVideos, setListVideos] = useState<VideoEvent[]>([]);
   const [termsSearch, setTermsSearch] = useState<TermsSearchType>(null);
   const [minutesPerDayParams, setMinutesPerDayParams] =
     useState<MinutesPerDayParams>({
@@ -76,7 +76,7 @@ export function ScheduleProvider({ children }: ScheduleProviderProps) {
 
   const getVideos = async (
     maxResults: number,
-    termsSearch: any,
+    termsSearch: TermsSearchType,
     accumulatedVideos: VideoEvent[] = [],
     pageToken?: string
   ): Promise<VideoEvent[]> => {
@@ -95,7 +95,7 @@ export function ScheduleProvider({ children }: ScheduleProviderProps) {
       return accumulatedVideos;
     }
 
-    const updatedVideos = [...accumulatedVideos, ...newVideos];
+    const updatedVideos = [...accumulatedVideos, ...newVideos] as VideoEvent[];
     const remainingResults = maxResults - newVideos.length;
 
     if (remainingResults <= 0 || !nextPageToken) {
@@ -113,16 +113,24 @@ export function ScheduleProvider({ children }: ScheduleProviderProps) {
 
   const getVideosWithDurations = async () => {
     const videos = await getVideos(minutesPerDayParams.qtdeVideos, termsSearch);
+    const biggerDay = minutesPerDayParams.days.reduce((acc, day) => {
+      return acc.minutes > day.minutes ? acc : day;
+    });
+
     const listIds = videos?.map((video) => video.id);
     const durations = await getVideoDurations(listIds as string[]);
     const listVideosWithDurations = videos?.map((video) => {
       const duration = durations.find((duration) => duration.id === video.id);
       return {
         ...video,
-        durationMinutes: duration ? duration.durationMinutes : 0,
+        durationMinutes: duration ? Math.ceil(duration.durationMinutes) : 0,
       };
     });
-    return listVideosWithDurations;
+    const videosFilterTime = listVideosWithDurations.filter(
+      (video) => video.durationMinutes < biggerDay.minutes
+    );
+    console.log("videosFilterTime", videosFilterTime);
+    return videosFilterTime;
   };
 
   const executeGenerateSchedule = async () => {
@@ -133,28 +141,42 @@ export function ScheduleProvider({ children }: ScheduleProviderProps) {
       }
 
       // Função para obter a próxima data para um dia da semana específico
-      const getNextDayDate = (dayName: DayOfWeek): Date => {
+      const getNextDayDate = (dayName: DayOfWeek, inicialDate: Date): Date => {
         const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-        const today = new Date();
         const targetDayIndex = days.indexOf(dayName);
-        const todayIndex = today.getDay(); // 0 = domingo, 1 = segunda, etc.
+        const todayIndex = inicialDate.getDay(); // 0 = domingo, 1 = segunda, etc.
 
         let daysToAdd = targetDayIndex - todayIndex;
         if (daysToAdd <= 0) {
-          // Se for hoje ou já passou, vai para próxima semana
+          // Se já passou, vai para próxima semana
           daysToAdd += 7;
         }
-
-        const targetDate = new Date(today);
-        targetDate.setDate(today.getDate() + daysToAdd);
+        if (daysToAdd === 0) {
+          // Se for o mesmo dia, adiciona 7 dias para evitar agendar no mesmo dia
+          daysToAdd += 7;
+        }
+        // Adiciona os dias ao dia atual
+        // e retorna a nova data
+        const targetDate = new Date(inicialDate);
+        targetDate.setDate(inicialDate.getDate() + daysToAdd);
         return targetDate;
       };
 
       // Função recursiva para processar cada dia
       const processDayRecursive = async (
         remainingDays: MinutesPerDay[],
-        scheduledVideos: any[]
-      ): Promise<any[]> => {
+        scheduledVideos: VideoEvent[],
+        inicialDate: Date
+      ): Promise<VideoEvent[]> => {
+        const videosUnused = scheduledVideos.filter(
+          (video) => video.start === undefined
+        ) as VideoEvent[];
+
+        // Se não houver vídeos não agendados, retorne a lista atual
+        if (videosUnused.length > 0 && remainingDays.length === 0) {
+          remainingDays = minutesPerDayParams.days;
+        }
+
         if (remainingDays.length === 0) {
           return scheduledVideos;
         }
@@ -164,8 +186,8 @@ export function ScheduleProvider({ children }: ScheduleProviderProps) {
         let updatedVideos = [...scheduledVideos];
 
         // Obter a data para o dia da semana atual
-        const dayDate = getNextDayDate(currentDay.day);
-
+        const dayDate = getNextDayDate(currentDay.day, inicialDate);
+        inicialDate.setDate(dayDate.getDate() + 1); // Avançar para o próximo dia
         // Horário inicial - começamos às 9:00 (ajuste conforme necessário).
         let currentHour = 9;
         let currentMinute = 0;
@@ -214,12 +236,16 @@ export function ScheduleProvider({ children }: ScheduleProviderProps) {
         } while (availableMinutes > 0 && !videosProcessed);
 
         // Processar o próximo dia recursivamente
-        return processDayRecursive(otherDays, updatedVideos);
+        return processDayRecursive(otherDays, updatedVideos, inicialDate);
       };
 
+      // Processar os dias da semana com os vídeos
+      // Enquanto ainda existirem vídeos não agendados, continue a executar processDayRecursive
+      const today = new Date();
       const scheduledVideos = await processDayRecursive(
         minutesPerDayParams.days,
-        videos
+        videos,
+        today
       );
 
       // Filtrar apenas vídeos que foram agendados
