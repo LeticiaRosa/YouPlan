@@ -1,12 +1,11 @@
 import { api } from "../clients/youtube";
-import { VideoDuration, YouTubeVideo } from "../types/youtube";
+import { VideoDuration, YouTubeResponse, YouTubeVideo } from "../types/youtube";
 
-/**
- * Busca vídeos no YouTube com base no termo de busca
- */
 export async function buscarVideosYouTube(
-  termo: string
-): Promise<YouTubeVideo[]> {
+  maxResults: number,
+  termo: string,
+  pageToken?: string
+): Promise<YouTubeResponse | []> {
   const API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY;
   try {
     const response = await api.get("/search", {
@@ -14,9 +13,10 @@ export async function buscarVideosYouTube(
         key: API_KEY,
         q: termo,
         part: "snippet",
-        maxResults: 50,
+        maxResults: maxResults,
         type: "video",
         videoDuration: "medium",
+        pageToken: pageToken,
       },
     });
 
@@ -29,23 +29,23 @@ export async function buscarVideosYouTube(
           thumbnails: { medium: { url: string } };
         };
       }) => ({
-        videoId: item.id.videoId,
+        id: item.id.videoId,
         title: item.snippet.title,
         description: item.snippet.description,
         thumbnailUrl: item.snippet.thumbnails.medium.url,
       })
     );
 
-    return videos;
+    return {
+      videos,
+      nextPageToken: response.data.nextPageToken,
+    };
   } catch (error) {
     console.error("Erro ao buscar vídeos do YouTube:", error);
-    return [];
+    return { videos: [], nextPageToken: null };
   }
 }
 
-/**
- * Obtém a duração de vídeos por seus IDs
- */
 export const getVideoDurations = async (
   videoIds: string[]
 ): Promise<VideoDuration[]> => {
@@ -72,16 +72,23 @@ export const getVideoDurations = async (
       },
     });
 
-    const durations = response.data.items.map((duration: any) => {
-      const parsedDuration = parseISODurationToMinutes(
-        duration.contentDetails.duration
-      );
-      return {
-        id: duration.id,
-        duration: duration.contentDetails.duration,
-        durationMinutes: parsedDuration,
-      };
-    });
+    const durations = response.data.items.map(
+      (duration: {
+        id: string;
+        contentDetails: {
+          duration: string;
+        };
+      }) => {
+        const parsedDuration = parseISODurationToMinutes(
+          duration.contentDetails.duration
+        );
+        return {
+          id: duration.id,
+          duration: duration.contentDetails.duration,
+          durationMinutes: parsedDuration,
+        };
+      }
+    );
 
     return durations;
   } catch (err) {

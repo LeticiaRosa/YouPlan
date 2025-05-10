@@ -1,12 +1,12 @@
 import { UseFormRegister } from "react-hook-form";
-import { schemaType } from "./Minutes-per-day";
+import { SearchForm } from "../schema";
 
 export interface InputMinutesPerDayProps {
   id: number;
   name: "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
   type: string;
   placeholder: number;
-  register: UseFormRegister<schemaType>;
+  register: UseFormRegister<SearchForm>;
   error?: boolean; // Adicionando propriedade de erro
 }
 

@@ -7,7 +7,8 @@ import {
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import React, { useState } from "react";
+import { useContext, useState } from "react";
+import { ScheduleContext } from "../contexts/ScheduleContext";
 
 const locales = {
   "pt-BR": ptBR,
@@ -22,61 +23,29 @@ const localizer = dateFnsLocalizer({
 });
 
 // Tipagem do evento
-interface VideoEvent extends CalendarEvent {
-  title: string;
-  start: Date;
-  end: Date;
+export interface VideoEvent extends CalendarEvent {
+  id: string;
+  description?: string;
+  dayName: string;
+  thumbnailUrl?: string;
+  durationMinutes: number;
 }
 
-// Datas relativas ao mês atual em vez de datas fixas no futuro distante
-const currentDate = new Date();
-const events: VideoEvent[] = [
-  {
-    title: "Curso React - 30min",
-    start: new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth(),
-      currentDate.getDate(),
-      14,
-      0
-    ),
-    end: new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth(),
-      currentDate.getDate(),
-      14,
-      30
-    ),
-  },
-  {
-    title: "YouTube API - 45min",
-    start: new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth(),
-      currentDate.getDate() + 1,
-      20,
-      0
-    ),
-    end: new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth(),
-      currentDate.getDate() + 1,
-      20,
-      45
-    ),
-  },
-];
-
-export const VideoSchedule: React.FC = () => {
+export function VideoSchedule() {
   const [date, setDate] = useState(new Date());
   const [view, setView] = useState<View>("month");
-
+  const { listVideos } = useContext(ScheduleContext);
+  console.log("lista", listVideos);
   const handleNavigate = (newDate: Date) => {
     setDate(newDate);
   };
 
   const handleView = (newView: View) => {
     setView(newView);
+  };
+
+  const handleSelectEvent = (event: VideoEvent) => {
+    window.open(`https://www.youtube.com/watch?v=${event.id}`, "_blank");
   };
 
   return (
@@ -87,16 +56,17 @@ export const VideoSchedule: React.FC = () => {
       <div style={{ height: 500 }}>
         <Calendar
           localizer={localizer}
-          events={events}
+          events={listVideos}
           startAccessor="start"
           endAccessor="end"
-          views={["month", "week", "day", "agenda"]}
+          views={["month", "agenda"]}
           defaultView="month"
           view={view}
           date={date}
           onNavigate={handleNavigate}
           onView={handleView}
           culture="pt-BR"
+          onSelectEvent={(event) => handleSelectEvent(event)}
           style={{ height: "100%" }}
           messages={{
             week: "Semana",
@@ -117,4 +87,4 @@ export const VideoSchedule: React.FC = () => {
       </div>
     </div>
   );
-};
+}

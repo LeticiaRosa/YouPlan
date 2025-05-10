@@ -1,8 +1,8 @@
 import { UseFormRegister } from "react-hook-form";
-import { schemaType } from "./Minutes-per-day";
+import { SearchForm } from "../schema";
 
 type NumberOfVideosProps = {
-  register: UseFormRegister<schemaType>;
+  register: UseFormRegister<SearchForm>;
   error: boolean;
 };
 
