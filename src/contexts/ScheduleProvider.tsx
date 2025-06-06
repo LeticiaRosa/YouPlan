@@ -135,7 +135,6 @@ export function ScheduleProvider({ children }: ScheduleProviderProps) {
     const videosFilterTime = listVideosWithDurations.filter(
       (video) => video.durationMinutes < biggerDay.minutes
     );
-    console.log("videosFilterTime", videosFilterTime);
     return videosFilterTime;
   };
 
@@ -157,14 +156,9 @@ export function ScheduleProvider({ children }: ScheduleProviderProps) {
 
       // Função para obter a próxima data para um dia da semana específico
       const getNextDayDate = (dayName: DayOfWeek, inicialDate: Date): Date => {
-        console.log("getNextDayDate", dayName, inicialDate);
         const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
         const targetDayIndex = days.indexOf(dayName);
         const todayIndex = inicialDate.getDay();
-
-        console.log("targetDayIndex", targetDayIndex);
-        console.log("todayIndex", todayIndex);
-
         let daysToAdd = targetDayIndex - todayIndex;
 
         // Se for o mesmo dia, usar hoje
