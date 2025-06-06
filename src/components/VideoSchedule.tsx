@@ -35,7 +35,7 @@ export function VideoSchedule() {
   const [date, setDate] = useState(new Date());
   const [view, setView] = useState<View>("month");
   const { listVideos } = useContext(ScheduleContext);
-  console.log("lista", listVideos);
+
   const handleNavigate = (newDate: Date) => {
     setDate(newDate);
   };

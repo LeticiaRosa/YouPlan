@@ -42,7 +42,10 @@ export type ScheduleContextType = {
   clearTerms: () => void;
   minutesPerDayParams: MinutesPerDayParams;
   setMinutesPerDay: (terms: MinutesPerDayParams) => void;
-  executeGenerateSchedule: () => void;
+  executeGenerateSchedule: (
+    minutes: MinutesPerDayParams,
+    terms: TermsSearchType
+  ) => void;
 };
 
 export function ScheduleProvider({ children }: ScheduleProviderProps) {
@@ -111,9 +114,12 @@ export function ScheduleProvider({ children }: ScheduleProviderProps) {
     );
   };
 
-  const getVideosWithDurations = async () => {
-    const videos = await getVideos(minutesPerDayParams.qtdeVideos, termsSearch);
-    const biggerDay = minutesPerDayParams.days.reduce((acc, day) => {
+  const getVideosWithDurations = async (
+    paramsMinutes: MinutesPerDayParams,
+    paramsTermsSearch: TermsSearchType
+  ) => {
+    const videos = await getVideos(paramsMinutes.qtdeVideos, paramsTermsSearch);
+    const biggerDay = paramsMinutes.days.reduce((acc, day) => {
       return acc.minutes > day.minutes ? acc : day;
     });
 
@@ -133,30 +139,43 @@ export function ScheduleProvider({ children }: ScheduleProviderProps) {
     return videosFilterTime;
   };
 
-  const executeGenerateSchedule = async () => {
+  const executeGenerateSchedule = async (
+    paramsMinutes?: MinutesPerDayParams,
+    paramsTermsSearch?: TermsSearchType
+  ) => {
     try {
-      const videos = await getVideosWithDurations();
+      // Usar parâmetros passados ou o estado atual
+      const currentParamsMinutes = paramsMinutes || minutesPerDayParams;
+      const currentParamsTerms = paramsTermsSearch || termsSearch;
+      const videos = await getVideosWithDurations(
+        currentParamsMinutes,
+        currentParamsTerms
+      );
       if (!videos || videos.length === 0) {
         return;
       }
 
       // Função para obter a próxima data para um dia da semana específico
       const getNextDayDate = (dayName: DayOfWeek, inicialDate: Date): Date => {
+        console.log("getNextDayDate", dayName, inicialDate);
         const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
         const targetDayIndex = days.indexOf(dayName);
-        const todayIndex = inicialDate.getDay(); // 0 = domingo, 1 = segunda, etc.
+        const todayIndex = inicialDate.getDay();
+
+        console.log("targetDayIndex", targetDayIndex);
+        console.log("todayIndex", todayIndex);
 
         let daysToAdd = targetDayIndex - todayIndex;
-        if (daysToAdd <= 0) {
-          // Se já passou, vai para próxima semana
-          daysToAdd += 7;
-        }
+
+        // Se for o mesmo dia, usar hoje
         if (daysToAdd === 0) {
-          // Se for o mesmo dia, adiciona 7 dias para evitar agendar no mesmo dia
+          daysToAdd = 0;
+        }
+        // Se o dia já passou nesta semana, ir para próxima semana
+        else if (daysToAdd < 0) {
           daysToAdd += 7;
         }
-        // Adiciona os dias ao dia atual
-        // e retorna a nova data
+
         const targetDate = new Date(inicialDate);
         targetDate.setDate(inicialDate.getDate() + daysToAdd);
         return targetDate;
@@ -172,38 +191,52 @@ export function ScheduleProvider({ children }: ScheduleProviderProps) {
           (video) => video.start === undefined
         ) as VideoEvent[];
 
-        // Se não houver vídeos não agendados, retorne a lista atual
-        if (videosUnused.length > 0 && remainingDays.length === 0) {
-          remainingDays = minutesPerDayParams.days;
-        }
-
+        // Se não há mais dias para processar
         if (remainingDays.length === 0) {
+          // Se ainda há vídeos não agendados, reiniciar o ciclo de dias
+          if (videosUnused.length > 0) {
+            // Filtrar apenas dias com minutos > 0
+            const daysWithMinutes = currentParamsMinutes.days.filter(
+              (day) => day.minutes > 0
+            );
+            if (daysWithMinutes.length > 0) {
+              return processDayRecursive(
+                daysWithMinutes,
+                scheduledVideos,
+                inicialDate
+              );
+            }
+          }
           return scheduledVideos;
         }
 
         const [currentDay, ...otherDays] = remainingDays;
+
+        // Pular dias com 0 minutos
+        if (currentDay.minutes === 0) {
+          return processDayRecursive(otherDays, scheduledVideos, inicialDate);
+        }
+
         let availableMinutes = currentDay.minutes;
         let updatedVideos = [...scheduledVideos];
 
         // Obter a data para o dia da semana atual
         const dayDate = getNextDayDate(currentDay.day, inicialDate);
-        inicialDate.setDate(dayDate.getDate() + 1); // Avançar para o próximo dia
-        // Horário inicial - começamos às 9:00 (ajuste conforme necessário).
+
+        // Horário inicial - começamos às 9:00
         let currentHour = 9;
         let currentMinute = 0;
 
-        let videosProcessed = false;
-
-        do {
+        // Processar vídeos para este dia
+        while (availableMinutes > 0) {
           // Encontrar próximo vídeo que cabe no tempo disponível
           const availableVideo = updatedVideos.find(
             (video) => !video.start && video.durationMinutes <= availableMinutes
           );
 
-          // Se não encontrou vídeo adequado, passar para o próximo dia
+          // Se não encontrou vídeo adequado, sair do loop
           if (!availableVideo) {
-            videosProcessed = true;
-            continue;
+            break;
           }
 
           // Criar datas de início e fim
@@ -226,24 +259,34 @@ export function ScheduleProvider({ children }: ScheduleProviderProps) {
                   ...video,
                   start: new Date(startTime),
                   end: new Date(endTime),
-                  dayName: currentDay.day, // Mantemos o nome do dia para referência
+                  dayName: currentDay.day,
                 }
               : video
           );
 
           // Subtrair o tempo do vídeo do tempo disponível
           availableMinutes -= availableVideo.durationMinutes;
-        } while (availableMinutes > 0 && !videosProcessed);
+        }
+
+        // Avançar a data inicial para evitar conflitos
+        const nextDate = new Date(dayDate);
+        nextDate.setDate(dayDate.getDate() + 1);
 
         // Processar o próximo dia recursivamente
-        return processDayRecursive(otherDays, updatedVideos, inicialDate);
+        return processDayRecursive(otherDays, updatedVideos, nextDate);
       };
 
       // Processar os dias da semana com os vídeos
       // Enquanto ainda existirem vídeos não agendados, continue a executar processDayRecursive
       const today = new Date();
+
+      // Filtrar apenas dias que têm minutos configurados
+      const activeDays = currentParamsMinutes.days.filter(
+        (day) => day.minutes > 0
+      );
+
       const scheduledVideos = await processDayRecursive(
-        minutesPerDayParams.days,
+        activeDays,
         videos,
         today
       );

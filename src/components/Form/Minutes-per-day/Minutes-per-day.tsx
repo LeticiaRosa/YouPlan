@@ -8,17 +8,7 @@ import {
 } from "./Input-minutes-per-day";
 import { NumberOfVideos } from "./Number-of-videos";
 import { MinutesPerDayParams } from "../../../contexts/ScheduleProvider";
-
-type MinutesPerDaySchema = {
-  Mon: number;
-  Tue: number;
-  Wed: number;
-  Thu: number;
-  Fri: number;
-  Sat: number;
-  Sun: number;
-  qtdeVideos: number;
-};
+import { SearchForm } from "../schema";
 
 export function MinutesPerDay() {
   const { setMinutesPerDay, termsSearch, executeGenerateSchedule } =
@@ -28,11 +18,11 @@ export function MinutesPerDay() {
     register,
     formState: { errors },
     setError,
-  } = useFormContext<MinutesPerDaySchema>();
+  } = useFormContext<SearchForm>();
 
-  function onHandleSubmit(data: MinutesPerDaySchema) {
-    if (!termsSearch) {
-      setError("search" as keyof MinutesPerDaySchema, {
+  function onHandleSubmit(data: SearchForm) {
+    if (!termsSearch || termsSearch.length === 0) {
+      setError("search" as keyof SearchForm, {
         type: "manual",
         message: "Informe por favor os termos de busca no campo Search",
       });
@@ -47,13 +37,14 @@ export function MinutesPerDay() {
       data.Sat === 0 &&
       data.Sun === 0
     ) {
-      setError("Mon" as keyof MinutesPerDaySchema, {
+      setError("Mon" as keyof SearchForm, {
         type: "manual",
         message: "Informe por favor a quantidade de minutos nos dias da semana",
       });
       return;
     }
-    setMinutesPerDay({
+
+    const minutesPerDay: MinutesPerDayParams = {
       days: [
         { day: "Mon", minutes: data.Mon },
         { day: "Tue", minutes: data.Tue },
@@ -64,8 +55,9 @@ export function MinutesPerDay() {
         { day: "Sun", minutes: data.Sun },
       ],
       qtdeVideos: data.qtdeVideos,
-    } as MinutesPerDayParams);
-    executeGenerateSchedule();
+    };
+    setMinutesPerDay(minutesPerDay);
+    executeGenerateSchedule(minutesPerDay, termsSearch);
   }
 
   return (
@@ -86,8 +78,8 @@ export function MinutesPerDay() {
                 name={name}
                 type={type}
                 placeholder={placeholder}
-                register={register as UseFormRegister<MinutesPerDaySchema>}
-                error={!!errors[name as keyof MinutesPerDaySchema]} // Passando informação de erro como boolean
+                register={register as UseFormRegister<SearchForm>}
+                error={!!errors[name as keyof SearchForm]} // Passando informação de erro como boolean
               />
             )
           )}
@@ -96,24 +88,22 @@ export function MinutesPerDay() {
 
       <div className="flex flex-row items-end justify-between gap-2 mt-4">
         <NumberOfVideos
-          register={register as UseFormRegister<MinutesPerDaySchema>}
+          register={register as UseFormRegister<SearchForm>}
           error={!!errors["qtdeVideos"]}
         />
-        <div className="flex flex-row items-end justify-between gap-2 mt-4">
-          <p className="error">
-            {errors.Mon?.message ||
-              errors.Tue?.message ||
-              errors.Wed?.message ||
-              errors.Thu?.message ||
-              errors.Fri?.message ||
-              errors.Sat?.message ||
-              errors.Sun?.message ||
-              errors.qtdeVideos?.message}
-          </p>
-          <button type="submit" className="button text-base">
-            Generate Schedule
-          </button>
-        </div>
+        <p className="error">
+          {errors.Mon?.message ||
+            errors.Tue?.message ||
+            errors.Wed?.message ||
+            errors.Thu?.message ||
+            errors.Fri?.message ||
+            errors.Sat?.message ||
+            errors.Sun?.message ||
+            errors.qtdeVideos?.message}
+        </p>
+        <button type="submit" className="button text-base">
+          Generate Schedule
+        </button>
       </div>
     </form>
   );
