@@ -34,6 +34,9 @@ export interface VideoEvent extends CalendarEvent {
 export function VideoSchedule() {
   const [date, setDate] = useState(new Date());
   const [view, setView] = useState<View>("month");
+  const [showModal, setShowModal] = useState(false);
+  const [modalEvents, setModalEvents] = useState<VideoEvent[]>([]);
+  const [modalDate, setModalDate] = useState<Date | null>(null);
   const { listVideos, isLoading } = useContext(ScheduleContext);
 
   const handleNavigate = (newDate: Date) => {
@@ -48,12 +51,62 @@ export function VideoSchedule() {
     window.open(`https://www.youtube.com/watch?v=${event.id}`, "_blank");
   };
 
+  // Handler para o "+ X mais"
+  const handleShowMore = (events: VideoEvent[], date: Date) => {
+    setModalEvents(events);
+    setModalDate(date);
+    setShowModal(true);
+  };
+
   // Função para formatar eventos com duração
   const formatEventsWithDuration = (videos: VideoEvent[]) => {
     return videos.map((video) => ({
       ...video,
       title: `${video.title} (${video.durationMinutes}min)`,
     }));
+  };
+
+  // Modal para mostrar todos os eventos do dia
+  const EventsModal = () => {
+    if (!showModal || !modalDate) return null;
+
+    return (
+      <div className="fixed inset-0 bg-transparent bg-opacity-10 backdrop-blur-sm flex items-center justify-center z-50  ">
+        <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-96 overflow-y-auto border-gray-300 border shadow-lg">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold">
+              Eventos - {format(modalDate, "dd/MM/yyyy", { locale: ptBR })}
+            </h2>
+            <button
+              onClick={() => setShowModal(false)}
+              className="text-gray-500 hover:text-gray-700 text-2xl cursor-pointer"
+            >
+              ×
+            </button>
+          </div>
+
+          <div className="space-y-3">
+            {modalEvents.map((event) => (
+              <div
+                key={event.id}
+                className="border border-gray-200 rounded p-3 hover:bg-gray-50 cursor-pointer"
+                onClick={() => handleSelectEvent(event)}
+              >
+                <div className="font-medium text-sm mb-1">
+                  {event.start && event.end && (
+                    <span className="text-blue-600">
+                      {format(event.start as Date, "HH:mm")} -{" "}
+                      {format(event.end as Date, "HH:mm")}
+                    </span>
+                  )}
+                </div>
+                <div className="text-gray-800 text-sm">{event.title}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -78,6 +131,7 @@ export function VideoSchedule() {
               date={date}
               onNavigate={handleNavigate}
               onView={handleView}
+              onShowMore={handleShowMore} // Adicionar este handler
               culture="pt-BR"
               onSelectEvent={(event) => handleSelectEvent(event)}
               style={{ height: "100%" }}
@@ -100,6 +154,7 @@ export function VideoSchedule() {
           </div>
         )}
       </div>
+      <EventsModal />
     </div>
   );
 }
