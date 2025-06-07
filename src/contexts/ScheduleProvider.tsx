@@ -46,11 +46,14 @@ export type ScheduleContextType = {
     minutes: MinutesPerDayParams,
     terms: TermsSearchType
   ) => void;
+  isLoading: boolean;
 };
 
 export function ScheduleProvider({ children }: ScheduleProviderProps) {
   const [listVideos, setListVideos] = useState<VideoEvent[]>([]);
   const [termsSearch, setTermsSearch] = useState<TermsSearchType>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
   const [minutesPerDayParams, setMinutesPerDayParams] =
     useState<MinutesPerDayParams>({
       days: [
@@ -143,6 +146,7 @@ export function ScheduleProvider({ children }: ScheduleProviderProps) {
     paramsTermsSearch?: TermsSearchType
   ) => {
     try {
+      setIsLoading(true);
       // Usar parâmetros passados ou o estado atual
       const currentParamsMinutes = paramsMinutes || minutesPerDayParams;
       const currentParamsTerms = paramsTermsSearch || termsSearch;
@@ -151,6 +155,7 @@ export function ScheduleProvider({ children }: ScheduleProviderProps) {
         currentParamsTerms
       );
       if (!videos || videos.length === 0) {
+        setIsLoading(false);
         return;
       }
 
@@ -289,9 +294,11 @@ export function ScheduleProvider({ children }: ScheduleProviderProps) {
       const removeVideosUnused = scheduledVideos.filter(
         (video) => video.start !== undefined
       ) as VideoEvent[];
-
+      setIsLoading(false);
       setListVideos(removeVideosUnused);
     } catch (error) {
+      setIsLoading(false);
+      setListVideos([]);
       console.error("Erro ao gerar agenda:", error);
     }
   };
@@ -306,6 +313,7 @@ export function ScheduleProvider({ children }: ScheduleProviderProps) {
         setMinutesPerDay,
         executeGenerateSchedule,
         listVideos,
+        isLoading,
       }}
     >
       {children}

@@ -7,7 +7,7 @@ import {
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { ScheduleContext } from "../contexts/ScheduleContext";
 import { CalendarSkeleton } from "./CalendarSkeleton";
 
@@ -34,8 +34,7 @@ export interface VideoEvent extends CalendarEvent {
 export function VideoSchedule() {
   const [date, setDate] = useState(new Date());
   const [view, setView] = useState<View>("month");
-  const { listVideos } = useContext(ScheduleContext);
-  const [isLoading, setIsLoading] = useState(false);
+  const { listVideos, isLoading } = useContext(ScheduleContext);
 
   const handleNavigate = (newDate: Date) => {
     setDate(newDate);
@@ -56,15 +55,6 @@ export function VideoSchedule() {
       title: `${video.title} (${video.durationMinutes}min)`,
     }));
   };
-
-  useEffect(() => {
-    setIsLoading(true);
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [listVideos]);
 
   return (
     <div className="flex flex-col items-center justify-center w-full h-full p-4">
