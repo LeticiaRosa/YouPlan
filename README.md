@@ -4,8 +4,6 @@
 
 ![image](https://github.com/user-attachments/assets/be08c76e-2334-4539-816e-88f625e72fe1)
 
-## ✨ Funcionalidades Principais
-
 ### 🔍 **Sistema de Busca Inteligente**
 
 - Busca de vídeos por múltiplas palavras-chave simultâneas
