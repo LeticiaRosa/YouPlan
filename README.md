@@ -2,12 +2,14 @@
 
 **YouPlan** é uma aplicação web inteligente para planejar sua agenda semanal de vídeos do YouTube. Com uma interface moderna e algoritmos inteligentes, você pode otimizar seu tempo de visualização baseado na sua disponibilidade e interesses.
 
+![image](https://github.com/user-attachments/assets/be08c76e-2334-4539-816e-88f625e72fe1)
+
 ## ✨ Funcionalidades Principais
 
 ### 🔍 **Sistema de Busca Inteligente**
 
 - Busca de vídeos por múltiplas palavras-chave simultâneas
-- Suporte a pesquisas combinadas com operador OR
+- Suporte a pesquisas combinadas
 - Sistema de tags para gerenciar termos de busca
 - Validação para evitar termos duplicados
 
@@ -26,7 +28,6 @@
 - Calendário interativo com React Big Calendar
 - Modal para visualização detalhada de eventos
 - Skeleton loading para melhor UX
-- Tema em português brasileiro
 
 ### ⚡ **Performance e Otimização**
 
